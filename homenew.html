@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Webcrumbs Plugin</title>
+  <style>
+    @import url(https://fonts.googleapis.com/css2?family=Lato&display=swap);
+    @import url(https://fonts.googleapis.com/css2?family=Open+Sans&display=swap);
+    @import url(https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined);
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      content: ["./src/**/*.{html,js}"],
+      theme: { "name": "Custom", "fontFamily": { "sans": ["Open Sans", "ui-sans-serif", "system-ui", "sans-serif", "\"Apple Color Emoji\"", "\"Segoe UI Emoji\"", "\"Segoe UI Symbol\"", "\"Noto Color Emoji\""] }, "extend": { "fontFamily": { "title": ["Lato", "ui-sans-serif", "system-ui", "sans-serif", "\"Apple Color Emoji\"", "\"Segoe UI Emoji\"", "\"Segoe UI Symbol\"", "\"Noto Color Emoji\""], "body": ["Open Sans", "ui-sans-serif", "system-ui", "sans-serif", "\"Apple Color Emoji\"", "\"Segoe UI Emoji\"", "\"Segoe UI Symbol\"", "\"Noto Color Emoji\""] }, "colors": { "neutral": { "50": "#f7f7f7", "100": "#eeeeee", "200": "#e0e0e0", "300": "#cacaca", "400": "#b1b1b1", "500": "#999999", "600": "#7f7f7f", "700": "#676767", "800": "#545454", "900": "#464646", "950": "#282828" }, "primary": { "50": "#e6ffe4", "100": "#c6ffc4", "200": "#92ff90", "300": "#50ff53", "400": "#00ff0e", "500": "#00e613", "600": "#00b813", "700": "#008b0f", "800": "#076d13", "900": "#0b5c16", "950": "#003409", "DEFAULT": "#00ff0e" } } }, "fontSize": { "xs": ["12px", { "lineHeight": "19.200000000000003px" }], "sm": ["14px", { "lineHeight": "21px" }], "base": ["16px", { "lineHeight": "25.6px" }], "lg": ["18px", { "lineHeight": "27px" }], "xl": ["20px", { "lineHeight": "28px" }], "2xl": ["24px", { "lineHeight": "31.200000000000003px" }], "3xl": ["30px", { "lineHeight": "36px" }], "4xl": ["36px", { "lineHeight": "41.4px" }], "5xl": ["48px", { "lineHeight": "52.800000000000004px" }], "6xl": ["60px", { "lineHeight": "66px" }], "7xl": ["72px", { "lineHeight": "75.60000000000001px" }], "8xl": ["96px", { "lineHeight": "100.80000000000001px" }], "9xl": ["128px", { "lineHeight": "134.4px" }] }, "borderRadius": { "none": "0px", "sm": "6px", "DEFAULT": "12px", "md": "18px", "lg": "24px", "xl": "36px", "2xl": "48px", "3xl": "72px", "full": "9999px" }, "spacing": { "0": "0px", "1": "4px", "2": "8px", "3": "12px", "4": "16px", "5": "20px", "6": "24px", "7": "28px", "8": "32px", "9": "36px", "10": "40px", "11": "44px", "12": "48px", "14": "56px", "16": "64px", "20": "80px", "24": "96px", "28": "112px", "32": "128px", "36": "144px", "40": "160px", "44": "176px", "48": "192px", "52": "208px", "56": "224px", "60": "240px", "64": "256px", "72": "288px", "80": "320px", "96": "384px", "px": "1px", "0.5": "2px", "1.5": "6px", "2.5": "10px", "3.5": "14px" } },
+      plugins: [],
+      important: '#webcrumbs'
+    };
+  </script>
+
+  <div id="webcrumbs">
+    <div class="bg-white font-sans">
+      <nav class="sticky top-0 bg-white shadow-md z-50 backdrop-filter backdrop-blur-lg bg-opacity-80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between h-16">
+            <div class="flex items-center"> <a href="#" class="flex items-center"> <svg
+                  class="h-8 w-8 text-primary-600 transform transition-transform hover:rotate-12 duration-300"
+                  viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 4L3 8L12 12L21 8L12 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                  <path d="M3 16L12 20L21 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                  <path d="M3 12L12 16L21 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round"></path>
+                </svg> <span
+                  class="ml-2 text-xl font-bold bg-gradient-to-r from-primary-600 to-emerald-600 bg-clip-text text-transparent">Trash2Tech</span>
+              </a> </div>
+            <div class="hidden md:flex items-center space-x-8"> <a href="#"
+                class="text-neutral-700 hover:text-primary-600 transition-colors duration-200">Home</a> <a
+                href="#features"
+                class="text-neutral-700 hover:text-primary-600 transition-colors duration-200">Features</a> <a
+                href="#workflow"
+                class="text-neutral-700 hover:text-primary-600 transition-colors duration-200">Workflow</a> </a>
+            </div>
+            <div class="flex items-center"> <a href="index.html"
+                class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 hover:shadow-lg">
+                Log In </a> <button class="ml-4 md:hidden"> <span class="material-symbols-outlined">menu</span>
+              </button> </div>
+          </div>
+        </div>
+      </nav>
+      
+      <section class="relative bg-gradient-to-br from-neutral-50 to-emerald-50 overflow-hidden">
+        <div class="absolute inset-0 opacity-20"> <svg width="100%" height="100%" viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern
+                id="https://images.unsplash.com/photo-1567095761054-7a02e69e5c43?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=M3w3MzkyNDZ8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdHxlbnwwfHx8fDE3NTc3MzkyMzh8MA&amp;ixlib=rb-4.1.0&amp;q=80&amp;w=1080"
+                width="10" height="10" patternUnits="userSpaceOnUse">
+                <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#4ade80" stroke-width="0.5"></path>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%"
+              fill="url(https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?crop=entropy&amp;cs=tinysrgb&amp;fit=max&amp;fm=jpg&amp;ixid=M3w3MzkyNDZ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdHxlbnwwfHx8fDE3NTc3MzkyMzh8MA&amp;ixlib=rb-4.1.0&amp;q=80&amp;w=1080)">
+            </rect>
+          </svg> </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:py-32 relative">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div>
+              <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-neutral-900"> Monitor, Manage
+                &amp; Recycle Your E-Waste Smarter </h1>
+              <p class="mt-6 text-xl text-neutral-600"> A platform to track assets, schedule recycling, and measure
+                environmental impact. </p>
+              <div class="mt-8"> <a href="index.html"
+                  class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                  Get Started <span class="material-symbols-outlined ml-2">arrow_forward</span> </a> </div>
+            </div>
+            <div class="relative transform transition-all duration-700 hover:translate-y-[-10px]"> <img
+                src="WhatsApp Image 2025-09-14 at 13.16.39_6e21d551.jpg"
+                alt="E-Waste Management Platform"
+                class="rounded-lg shadow-xl transform hover:scale-105 transition-transform duration-300"
+                keywords="e-waste recycling, electronic waste management, eco tech, sustainability platform" /> </div>
+          </div>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
+      </section>
+      <section id="workflow" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-neutral-900">Our Simple Workflow</h2>
+            <p class="mt-4 text-xl text-neutral-600 max-w-3xl mx-auto"> From registration to recycling reports, our
+              platform makes e-waste management easy </p>
+          </div>
+          <div class="relative">
+            <div
+              class="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-primary-100 via-primary-500 to-emerald-500 transform -translate-y-1/2 z-0">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
+              <div
+                class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-neutral-100">
+                <div
+                  class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-6 mx-auto transform transition-transform hover:rotate-12 duration-300">
+                  <span class="material-symbols-outlined text-primary-600 text-3xl">person_add</span> </div>
+                <h3 class="text-xl font-bold text-center text-neutral-900 mb-4">Register Company/User</h3>
+                <p class="text-neutral-600 text-center">Create your account and set up your organization profile</p>
+              </div>
+              <div
+                class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-neutral-100">
+                <div
+                  class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-6 mx-auto transform transition-transform hover:rotate-12 duration-300">
+                  <span class="material-symbols-outlined text-emerald-600 text-3xl">inventory</span> </div>
+                <h3 class="text-xl font-bold text-center text-neutral-900 mb-4">Add Assets</h3>
+                <p class="text-neutral-600 text-center">Add and categorize your electronic assets into the system</p>
+              </div>
+              <div
+                class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-neutral-100">
+                <div
+                  class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-6 mx-auto transform transition-transform hover:rotate-12 duration-300">
+                  <span class="material-symbols-outlined text-primary-600 text-3xl">landscape</span> </div>
+                <h3 class="text-xl font-bold text-center text-neutral-900 mb-4">Track E-Waste Lifecycle</h3>
+                <p class="text-neutral-600 text-center">Monitor asset status, usage and end-of-life timelines</p>
+              </div>
+              <div
+                class="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-neutral-100">
+                <div
+                  class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-6 mx-auto transform transition-transform hover:rotate-12 duration-300">
+                  <span class="material-symbols-outlined text-emerald-600 text-3xl">analytics</span> </div>
+                <h3 class="text-xl font-bold text-center text-neutral-900 mb-4">Recycle &amp; Get Reports</h3>
+                <p class="text-neutral-600 text-center">Schedule pickups and receive detailed sustainability reports</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="recycling-process" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-neutral-900">Our Recycling Process</h2>
+            <p class="mt-4 text-xl text-neutral-600 max-w-3xl mx-auto">See what happens to your devices after collection</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+            <div class="text-center p-6 bg-emerald-50 rounded-lg">
+              <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 mx-auto shadow-md">
+                <span class="material-symbols-outlined text-emerald-600 text-3xl">inventory_2</span>
+              </div>
+              <h3 class="font-bold text-neutral-900 mb-2">Collection</h3>
+              <p class="text-sm text-neutral-600">We pick up your e-waste from your location</p>
+            </div>
+            <div class="text-center p-6 bg-emerald-50 rounded-lg">
+              <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 mx-auto shadow-md">
+                <span class="material-symbols-outlined text-emerald-600 text-3xl">sort</span>
+              </div>
+              <h3 class="font-bold text-neutral-900 mb-2">Sorting</h3>
+              <p class="text-sm text-neutral-600">Devices are categorized by type and condition</p>
+            </div>
+            <div class="text-center p-6 bg-emerald-50 rounded-lg">
+              <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 mx-auto shadow-md">
+                <span class="material-symbols-outlined text-emerald-600 text-3xl">settings</span>
+              </div>
+              <h3 class="font-bold text-neutral-900 mb-2">Processing</h3>
+              <p class="text-sm text-neutral-600">Data destruction and component separation</p>
+            </div>
+            <div class="text-center p-6 bg-emerald-50 rounded-lg">
+              <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 mx-auto shadow-md">
+                <span class="material-symbols-outlined text-emerald-600 text-3xl">recycling</span>
+              </div>
+              <h3 class="font-bold text-neutral-900 mb-2">Recycling</h3>
+              <p class="text-sm text-neutral-600">Materials are recovered for reuse</p>
+            </div>
+            <div class="text-center p-6 bg-emerald-50 rounded-lg">
+              <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 mx-auto shadow-md">
+                <span class="material-symbols-outlined text-emerald-600 text-3xl">stacked_line_chart</span>
+              </div>
+              <h3 class="font-bold text-neutral-900 mb-2">Reporting</h3>
+              <p class="text-sm text-neutral-600">You receive detailed impact reports</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="py-16 bg-gradient-to-r from-primary-600 to-emerald-600 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold">Our Environmental Impact</h2>
+            <p class="mt-4 text-xl opacity-90">Together with our users, we&#x27;re making a difference</p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div
+              class="bg-white bg-opacity-10 rounded-lg p-6 backdrop-blur-sm hover:bg-opacity-20 transition-all duration-300 transform hover:scale-105 border border-white border-opacity-20">
+              <div class="text-4xl md:text-5xl font-bold mb-2">2.5M+</div>
+              <div class="text-lg opacity-90">Devices Recycled</div>
+            </div>
+            <div
+              class="bg-white bg-opacity-10 rounded-lg p-6 backdrop-blur-sm hover:bg-opacity-20 transition-all duration-300 transform hover:scale-105 border border-white border-opacity-20">
+              <div class="text-4xl md:text-5xl font-bold mb-2">750+</div>
+              <div class="text-lg opacity-90">Active Companies</div>
+            </div>
+            <div
+              class="bg-white bg-opacity-10 rounded-lg p-6 backdrop-blur-sm hover:bg-opacity-20 transition-all duration-300 transform hover:scale-105 border border-white border-opacity-20">
+              <div class="text-4xl md:text-5xl font-bold mb-2">120+</div>
+              <div class="text-lg opacity-90">Recycling Centers</div>
+            </div>
+            <div
+              class="bg-white bg-opacity-10 rounded-lg p-6 backdrop-blur-sm hover:bg-opacity-20 transition-all duration-300 transform hover:scale-105 border border-white border-opacity-20">
+              <div class="text-4xl md:text-5xl font-bold mb-2">12K</div>
+              <div class="text-lg opacity-90">Tons CO₂ Saved</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="features" class="py-16 bg-neutral-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-neutral-900">Powerful Features</h2>
+            <p class="mt-4 text-xl text-neutral-600 max-w-3xl mx-auto"> Everything you need to manage your e-waste
+              efficiently and responsibly </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div
+              class="bg-white rounded-lg p-6 shadow hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-primary-500">
+              <div
+                class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mb-4 transform transition-transform hover:rotate-12 duration-300">
+                <span class="material-symbols-outlined text-primary-600">speed</span> </div>
+              <h3 class="text-xl font-bold text-neutral-900 mb-2">Real-Time Monitoring</h3>
+              <p class="text-neutral-600">Track your e-waste assets in real-time with detailed lifecycle information</p>
+            </div>
+            <div
+              class="bg-white rounded-lg p-6 shadow hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-emerald-500">
+              <div
+                class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4 transform transition-transform hover:rotate-12 duration-300">
+                <span class="material-symbols-outlined text-emerald-600">calendar_month</span> </div>
+              <h3 class="text-xl font-bold text-neutral-900 mb-2">Recycling Scheduler</h3>
+              <p class="text-neutral-600">Set up and manage recycling pickups and e-waste disposal events</p>
+            </div>
+            <div
+              class="bg-white rounded-lg p-6 shadow hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-primary-500">
+              <div
+                class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mb-4 transform transition-transform hover:rotate-12 duration-300">
+                <span class="material-symbols-outlined text-primary-600">description</span> </div>
+              <h3 class="text-xl font-bold text-neutral-900 mb-2">Compliance Reports</h3>
+              <p class="text-neutral-600">Generate reports that meet regulatory requirements for e-waste disposal</p>
+            </div>
+            <div
+              class="bg-white rounded-lg p-6 shadow hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-emerald-500">
+              <div
+                class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4 transform transition-transform hover:rotate-12 duration-300">
+                <span class="material-symbols-outlined text-emerald-600">insights</span> </div>
+              <h3 class="text-xl font-bold text-neutral-900 mb-2">Impact Analytics</h3>
+              <p class="text-neutral-600">Visualize your environmental impact with detailed analytics dashboards</p>
+            </div>
+            <div
+              class="bg-white rounded-lg p-6 shadow hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-primary-500">
+              <div
+                class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mb-4 transform transition-transform hover:rotate-12 duration-300">
+                <span class="material-symbols-outlined text-primary-600">business</span> </div>
+              <h3 class="text-xl font-bold text-neutral-900 mb-2">Corporate Programs</h3>
+              <p class="text-neutral-600">Tailored solutions for businesses with large-scale e-waste management needs
+              </p>
+            </div>
+            <div
+              class="bg-white rounded-lg p-6 shadow hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-emerald-500">
+              <div
+                class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-4 transform transition-transform hover:rotate-12 duration-300">
+                <span class="material-symbols-outlined text-emerald-600">diversity_3</span> </div>
+              <h3 class="text-xl font-bold text-neutral-900 mb-2">Community Drives</h3>
+              <p class="text-neutral-600">Organize and manage community e-waste collection events</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-neutral-900">What Our Users Say</h2>
+            <p class="mt-4 text-xl text-neutral-600 max-w-3xl mx-auto"> Hear from businesses and organizations using our
+              platform </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div
+              class="bg-neutral-50 rounded-lg p-6 shadow hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
+              <div class="flex items-center mb-4">
+                <div class="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center mr-4"> <span
+                    class="text-primary-600 font-bold text-xl">T</span> </div>
+                <div>
+                  <h4 class="font-bold text-neutral-900">TechGlobal Inc.</h4>
+                  <p class="text-neutral-600 text-sm">Enterprise Solutions</p>
+                </div>
+              </div>
+              <p class="text-neutral-700 italic"> &quot;EcoTrack has transformed how we manage our IT asset disposal.
+                The compliance reports save us countless hours and the dashboard gives us clear visibility into our
+                environmental impact.&quot; </p>
+              <div class="mt-4 flex text-emerald-500"> <span class="material-symbols-outlined">star</span> <span
+                  class="material-symbols-outlined">star</span> <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span> <span class="material-symbols-outlined">star</span>
+              </div>
+            </div>
+            <div
+              class="bg-neutral-50 rounded-lg p-6 shadow hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
+              <div class="flex items-center mb-4">
+                <div class="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center mr-4"> <span
+                    class="text-emerald-600 font-bold text-xl">G</span> </div>
+                <div>
+                  <h4 class="font-bold text-neutral-900">GreenLife Foundation</h4>
+                  <p class="text-neutral-600 text-sm">Non-Profit Organization</p>
+                </div>
+              </div>
+              <p class="text-neutral-700 italic"> &quot;The community drive features have helped us organize over 30
+                successful e-waste collection events this year. Our volunteers love how easy it is to coordinate and
+                track impact.&quot; </p>
+              <div class="mt-4 flex text-emerald-500"> <span class="material-symbols-outlined">star</span> <span
+                  class="material-symbols-outlined">star</span> <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span> <span
+                  class="material-symbols-outlined">star_half</span> </div>
+            </div>
+            <div
+              class="bg-neutral-50 rounded-lg p-6 shadow hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
+              <div class="flex items-center mb-4">
+                <div class="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center mr-4"> <span
+                    class="text-primary-600 font-bold text-xl">M</span> </div>
+                <div>
+                  <h4 class="font-bold text-neutral-900">MetroCity Government</h4>
+                  <p class="text-neutral-600 text-sm">Public Sector</p>
+                </div>
+              </div>
+              <p class="text-neutral-700 italic"> &quot;Implementing EcoTrack has helped us meet our sustainability
+                goals ahead of schedule. The reporting features make it easy to demonstrate our progress to stakeholders
+                and citizens.&quot; </p>
+              <div class="mt-4 flex text-emerald-500"> <span class="material-symbols-outlined">star</span> <span
+                  class="material-symbols-outlined">star</span> <span class="material-symbols-outlined">star</span>
+                <span class="material-symbols-outlined">star</span> <span class="material-symbols-outlined">star</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section> -->
+      <!-- <section class="py-16 bg-gradient-to-br from-neutral-900 to-emerald-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center max-w-3xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Start Monitoring Your E-Waste Today</h2>
+            <p class="text-xl mb-8 opacity-90"> Join hundreds of forward-thinking organizations taking control of their
+              e-waste management </p>
+          </div>
+        </div>
+      </section> -->
+     <section class="py-20 bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
+  <div class="container mx-auto px-6 text-center">
+    <h2 class="text-4xl sm:text-5xl font-extrabold mb-6 tracking-wide">
+      🌍 Explore Our Services
+    </h2>
+    <p class="text-xl sm:text-2xl mb-10 max-w-3xl mx-auto opacity-90">
+      Manage your e-waste journey with ease — from logging in to tracking assets and exploring your dashboard.
+    </p>
+
+    <div class="flex flex-col sm:flex-row justify-center gap-6">
+      <!-- Login -->
+      <a href="index.html"
+        class="px-10 py-4 rounded-full bg-white text-indigo-700 font-semibold text-lg shadow-lg hover:scale-105 hover:bg-gray-100 transition transform duration-300">
+        Login
+      </a>
+
+      
+    </div>
+  </div>
+</section>
+
+      <footer class="bg-gray-800 text-gray-300 py-12">
+        
+          <div class="pt-8 border-t border-gray-700 text-center md:flex md:justify-between md:text-left">
+            <p>© 2023 EcoTrack. All rights reserved.</p>
+            <div class="mt-4 md:mt-0"> <a href="#" class="mr-4 hover:text-primary-400 transition-colors">Privacy
+                Policy</a> <a href="#" class="mr-4 hover:text-primary-400 transition-colors">Terms of Service</a> <a
+                href="#" class="hover:text-primary-400 transition-colors">Cookie Policy</a> </div>
+         
+        </div>
+      </footer>
+    </div>
+  </div>
+
+</body>
+
+</html>

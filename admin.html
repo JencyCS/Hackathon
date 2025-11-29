@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recycling Admin - Device Tracking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --accent: #10b981;
+            --warning: #ef4444;
+            --light: #f3f4f6;
+            --dark: #1f2937;
+            --text: #374151;
+            --text-light: #6b7280;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9fafb;
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Top Navigation Bar */
+        .top-nav {
+            background: var(--dark);
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            width: 100%;
+        }
+        
+        .logo h2 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .top-nav-links {
+            display: flex;
+            list-style: none;
+            gap: 20px;
+        }
+        
+        .top-nav-links a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+        
+        .top-nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .top-nav-links a.active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            width: 100%;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 18px 25px;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--light);
+            border-radius: 8px;
+            padding: 10px 18px;
+            width: 320px;
+        }
+        
+        .search-box input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            padding: 6px;
+            outline: none;
+            font-size: 15px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 22px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+        
+        .bg-primary { background: rgba(37, 99, 235, 0.15); color: var(--primary); }
+        .bg-accent { background: rgba(16, 185, 129, 0.15); color: var(--accent); }
+        .bg-warning { background: rgba(239, 68, 68, 0.15); color: var(--warning); }
+        .bg-dark { background: rgba(31, 41, 55, 0.15); color: var(--dark); }
+        
+        .stat-info h3 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+        
+        .stat-info p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        
+        /* Tables */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .table-header {
+            padding: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--light);
+        }
+        
+        .table-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            background: var(--light);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn:hover {
+            background: #e5e7eb;
+        }
+        
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: var(--light);
+        }
+        
+        th, td {
+            padding: 16px 22px;
+            text-align: left;
+            border-bottom: 1px solid var(--light);
+        }
+        
+        th {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        tbody tr {
+            transition: background 0.2s;
+        }
+        
+        tbody tr:hover {
+            background: rgba(37, 99, 235, 0.03);
+        }
+        
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-pending { background: #ffedd5; color: #ea580c; }
+        .status-approved { background: #dcfce7; color: #16a34a; }
+        .status-rejected { background: #fee2e2; color: #dc2626; }
+        .status-completed { background: #dbeafe; color: #2563eb; }
+        
+        .action-btn {
+            padding: 7px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: var(--light);
+            color: var(--text);
+            margin-right: 8px;
+            transition: all 0.2s;
+        }
+        
+        .view-btn { background: rgba(37, 99, 235, 0.15); color: var(--primary); }
+        .view-btn:hover { background: rgba(37, 99, 235, 0.25); }
+        
+        .edit-btn { background: rgba(16, 185, 129, 0.15); color: var(--accent); }
+        .edit-btn:hover { background: rgba(16, 185, 129, 0.25); }
+        
+        .delete-btn { background: rgba(239, 68, 68, 0.15); color: var(--warning); }
+        .delete-btn:hover { background: rgba(239, 68, 68, 0.25); }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(3px);
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 500px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 20px 25px 0;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.4rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.2s;
+        }
+        
+        .close-btn:hover {
+            color: var(--dark);
+        }
+        
+        .modal-body {
+            padding: 0 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        
+        .form-group input:read-only {
+            background-color: #f9fafb;
+            color: var(--text-light);
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+            padding: 0 25px 25px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-secondary {
+            background: var(--light);
+            color: var(--text);
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        
+        /* Access Log Styles */
+        .access-log {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 25px;
+        }
+        
+        .access-log h2 {
+            margin-bottom: 18px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .log-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--light);
+        }
+        
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        
+        .log-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary);
+            font-size: 18px;
+        }
+        
+        .log-info h4 {
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .log-info p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            background: var(--dark);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.success {
+            background: var(--accent);
+        }
+        
+        .toast.error {
+            background: var(--warning);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .top-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .top-nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .filters {
+                flex-wrap: wrap;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .top-nav-links {
+                gap: 10px;
+            }
+            
+            .top-nav-links a {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <div class="top-nav">
+        <div class="logo">
+            <h2><i class="fas fa-recycle"></i> EcoTech Admin</h2>
+        </div>
+        <ul class="top-nav-links">
+            <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            
+            <div class="user-info">
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="user-avatar">AD</div>
+                <div class="user-details">
+                    <h4>Admin User</h4>
+                    <p>Administrator</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Cards -->
+        <div class="dashboard-cards">
+            <div class="card stat-card">
+                <div class="stat-icon bg-primary">
+                    <i class="fas fa-laptop"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="total-devices">0</h3>
+                    <p>Total Devices</p>
+                </div>
+            </div>
+            
+            <div class="card stat-card">
+                <div class="stat-icon bg-accent">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="pending-requests">0</h3>
+                    <p>Pending Requests</p>
+                </div>
+            </div>
+            
+            <div class="card stat-card">
+                <div class="stat-icon bg-warning">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="rejected-requests">0</h3>
+                    <p>Rejected Requests</p>
+                </div>
+            </div>
+            
+            <div class="card stat-card">
+                <div class="stat-icon bg-dark">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="completed-processes">0</h3>
+                    <p>Completed Processes</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Device Requests Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2>Device Recycling Requests</h2>
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all"><i class="fas fa-filter"></i> All</button>
+                    <button class="filter-btn" data-filter="pending"><i class="fas fa-clock"></i> Pending</button>
+                    <button class="filter-btn" data-filter="approved"><i class="fas fa-check"></i> Approved</button>
+                    <button class="filter-btn" data-filter="rejected"><i class="fas fa-times"></i> Rejected</button>
+                </div>
+            </div>
+            
+            <table id="requests-table">
+                <thead>
+                    <tr>
+                        <th>Device ID</th>
+                        <th>Device Type</th>
+                        <th>Requested By</th>
+                        <th>Date Requested</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="requests-body">
+                    <tr>
+                        <td colspan="6">
+                            <div class="spinner" id="loading-spinner"></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Access Log Section -->
+        <div class="access-log">
+            <h2><i class="fas fa-history"></i> Recent Access Logs</h2>
+            <div id="access-log-container">
+                <div class="log-item">
+                    <div class="log-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <div class="log-info">
+                        <h4>Loading access logs...</h4>
+                        <p>Please wait while we load the data</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for viewing/editing request -->
+    <div class="modal" id="request-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-recycle"></i> Device Recycling Request</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="device-id">Device ID</label>
+                    <input type="text" id="device-id" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="device-type">Device Type</label>
+                    <input type="text" id="device-type" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="requested-by">Requested By</label>
+                    <input type="text" id="requested-by" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="user-email">User Email</label>
+                    <input type="text" id="user-email" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="user-phone">User Phone</label>
+                    <input type="text" id="user-phone" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="request-date">Request Date</label>
+                    <input type="text" id="request-date" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status">
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="admin-message">Message to User</label>
+                    <textarea id="admin-message">Your device recycling request has been processed. Please contact us at 555-1234 for further instructions.</textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-btn">Cancel</button>
+                <button class="btn btn-primary" id="save-btn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Changes saved successfully!</span>
+    </div>
+
+    <script>
+        // Firebase configuration - replace with your actual config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqTgVdqJsP4h5Dq-iqex5Eooe3TsRYLPw",
+            authDomain: "e-waste-149d2.firebaseapp.com",
+            projectId: "e-waste-149d2",
+            storageBucket: "e-waste-149d2.firebasestorage.app",
+            messagingSenderId: "673162803344",
+            appId: "1:673162803344:web:31f6190298e301b8ca4015",
+            measurementId: "G-V6VFSC3NJE"
+         };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        // DOM elements
+        const requestsBody = document.getElementById('requests-body');
+        const accessLogContainer = document.getElementById('access-log-container');
+        const modal = document.getElementById('request-modal');
+        const closeBtn = document.querySelector('.close-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        
+        // Statistics elements
+        const totalDevicesEl = document.getElementById('total-devices');
+        const pendingRequestsEl = document.getElementById('pending-requests');
+        const rejectedRequestsEl = document.getElementById('rejected-requests');
+        const completedProcessesEl = document.getElementById('completed-processes');
+        
+        // Current selected request
+        let currentRequest = null;
+        let allRequests = [];
+        
+        // Initialize the UI
+        function initUI() {
+            // Fetch data from Firebase
+            fetchRequestsFromFirebase();
+            
+            // Set up event listeners
+            setupEventListeners();
+        }
+        
+        // Fetch requests from Firebase
+        function fetchRequestsFromFirebase() {
+            // Show loading spinner
+            loadingSpinner.style.display = 'block';
+            
+            // In a real app, we would fetch from Firebase
+            // For demo purposes, we'll use sample data with a delay
+            setTimeout(() => {
+                // Sample data for demonstration
+                allRequests = [
+                    {
+                        id: 'DEV-2045',
+                        type: 'Laptop - Dell XPS 15',
+                        requestedBy: 'Sarah Johnson',
+                        email: 'sarah@example.com',
+                        phone: '555-1234',
+                        date: 'Oct 12, 2023',
+                        status: 'pending',
+                        docId: 'dev2045'
+                    },
+                    {
+                        id: 'DEV-1982',
+                        type: 'Monitor - LG UltraFine',
+                        requestedBy: 'Michael Chen',
+                        email: 'michael@example.com',
+                        phone: '555-5678',
+                        date: 'Oct 11, 2023',
+                        status: 'approved',
+                        docId: 'dev1982'
+                    },
+                    {
+                        id: 'DEV-1923',
+                        type: 'Tablet - iPad Pro',
+                        requestedBy: 'Emily Rodriguez',
+                        email: 'emily@example.com',
+                        phone: '555-9012',
+                        date: 'Oct 10, 2023',
+                        status: 'completed',
+                        docId: 'dev1923'
+                    },
+                    {
+                        id: 'DEV-1876',
+                        type: 'Phone - iPhone 12',
+                        requestedBy: 'David Kim',
+                        email: 'david@example.com',
+                        phone: '555-3456',
+                        date: 'Oct 9, 2023',
+                        status: 'rejected',
+                        docId: 'dev1876'
+                    },
+                    {
+                        id: 'DEV-1821',
+                        type: 'Desktop - HP Pavilion',
+                        requestedBy: 'Robert Wilson',
+                        email: 'robert@example.com',
+                        phone: '555-7890',
+                        date: 'Oct 8, 2023',
+                        status: 'pending',
+                        docId: 'dev1821'
+                    }
+                ];
+                
+                renderRequests(allRequests);
+                updateStatistics(allRequests);
+                fetchAccessLogs();
+                loadingSpinner.style.display = 'none';
+            }, 1500);
+        }
+        
+        // Fetch access logs from Firebase
+        function fetchAccessLogs() {
+            // In a real app, we would fetch from Firebase
+            // For demo purposes, we'll use sample data
+            const sampleLogs = [
+                {
+                    action: 'viewed',
+                    deviceId: 'DEV-2045',
+                    admin: 'Admin User',
+                    timestamp: 'September 14, 2023 at 13:30'
+                },
+                
+            ];
+            
+            renderAccessLogs(sampleLogs);
+        }
+        
+        // Render requests in the table
+        function renderRequests(requests) {
+            requestsBody.innerHTML = '';
+            
+            if (requests.length === 0) {
+                requestsBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 30px; color: var(--text-light);">
+                            <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                            No requests found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            requests.forEach(request => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${request.id}</td>
+                    <td>${request.type}</td>
+                    <td>${request.requestedBy}</td>
+                    <td>${request.date}</td>
+                    <td><span class="status status-${request.status}">${request.status.charAt(0).toUpperCase() + request.status.slice(1)}</span></td>
+                    <td>
+                        <button class="action-btn view-btn" data-id="${request.id}"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn edit-btn" data-id="${request.id}"><i class="fas fa-edit"></i></button>
+                    </td>
+                `;
+                requestsBody.appendChild(row);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('.view-btn, .edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const requestId = this.getAttribute('data-id');
+                    const request = allRequests.find(r => r.id === requestId);
+                    
+                    if (request) {
+                        openRequestModal(request);
+                    }
+                });
+            });
+        }
+        
+        // Update statistics
+        function updateStatistics(requests) {
+            totalDevicesEl.textContent = requests.length;
+            pendingRequestsEl.textContent = requests.filter(r => r.status === 'pending').length;
+            rejectedRequestsEl.textContent = requests.filter(r => r.status === 'rejected').length;
+            completedProcessesEl.textContent = requests.filter(r => r.status === 'completed').length;
+        }
+        
+        // Render access logs
+        function renderAccessLogs(logs) {
+            accessLogContainer.innerHTML = '';
+            
+            logs.forEach(log => {
+                const logItem = document.createElement('div');
+                logItem.className = 'log-item';
+                logItem.innerHTML = `
+                    <div class="log-icon">
+                        <i class="fas fa-${log.action.includes('viewed') ? 'eye' : log.action.includes('approved') ? 'check-circle' : 'edit'}"></i>
+                    </div>
+                    <div class="log-info">
+                        <h4>${log.admin} ${log.action} Device ${log.deviceId}</h4>
+                        <p>${log.timestamp}</p>
+                    </div>
+                `;
+                accessLogContainer.appendChild(logItem);
+            });
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Filter buttons
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Update active state
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Filter requests
+                    let filteredRequests = allRequests;
+                    if (filter !== 'all') {
+                        filteredRequests = allRequests.filter(r => r.status === filter);
+                    }
+                    
+                    renderRequests(filteredRequests);
+                });
+            });
+            
+            // Modal close buttons
+            closeBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+            
+            // Save button
+            saveBtn.addEventListener('click', saveRequestChanges);
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+        
+        // Open request modal
+        function openRequestModal(request) {
+            currentRequest = request;
+            
+            // Populate modal fields
+            document.getElementById('device-id').value = request.id;
+            document.getElementById('device-type').value = request.type;
+            document.getElementById('requested-by').value = request.requestedBy;
+            document.getElementById('user-email').value = request.email;
+            document.getElementById('user-phone').value = request.phone;
+            document.getElementById('request-date').value = request.date;
+            document.getElementById('status').value = request.status;
+            
+            // Show modal
+            modal.style.display = 'flex';
+        }
+        
+        // Close modal
+        function closeModal() {
+            modal.style.display = 'none';
+            currentRequest = null;
+        }
+        
+        // Show toast notification
+        function showToast(message, isSuccess = true) {
+            toastMessage.textContent = message;
+            toast.className = isSuccess ? 'toast success' : 'toast error';
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Save request changes
+        async function saveRequestChanges() {
+            if (!currentRequest) return;
+            
+            // Get new status and message
+            const newStatus = document.getElementById('status').value;
+            const message = document.getElementById('admin-message').value;
+            
+            try {
+                // Show loading state
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                saveBtn.disabled = true;
+                
+                // Update request in Firebase
+                await updateRequestInFirebase(currentRequest.docId, newStatus);
+                
+                // Send email to user
+                await sendEmailToUser(currentRequest.email, newStatus, message);
+                
+                // Add to access log
+                await addToAccessLog(currentRequest.id, newStatus);
+                
+                // Update local data
+                const requestIndex = allRequests.findIndex(r => r.id === currentRequest.id);
+                if (requestIndex !== -1) {
+                    allRequests[requestIndex].status = newStatus;
+                }
+                
+                // Show success message
+                showToast('Changes saved successfully! Email sent to user.');
+                
+                // Update UI
+                const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
+                let filteredRequests = allRequests;
+                if (activeFilter !== 'all') {
+                    filteredRequests = allRequests.filter(r => r.status === activeFilter);
+                }
+                
+                renderRequests(filteredRequests);
+                updateStatistics(allRequests);
+                
+                // Close modal
+                closeModal();
+            } catch (error) {
+                console.error("Error saving changes: ", error);
+                showToast('Error saving changes. Please try again.', false);
+            } finally {
+                // Reset button state
+                saveBtn.innerHTML = 'Save Changes';
+                saveBtn.disabled = false;
+            }
+        }
+        
+        // Update request in Firebase
+        async function updateRequestInFirebase(requestId, newStatus) {
+            // In a real application, update the document in Firebase
+            // This is a simulation of that operation
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    console.log(`Request ${requestId} updated to status: ${newStatus}`);
+                    resolve();
+                }, 800);
+            });
+            
+            // Real implementation would look like:
+            /*
+            return db.collection("recyclingRequests").doc(requestId).update({
+                status: newStatus,
+                lastUpdated: new Date(),
+                adminMessage: document.getElementById('admin-message').value
+            });
+            */
+        }
+        
+        // Send email to user
+        async function sendEmailToUser(userEmail, newStatus, message) {
+            // In a real application, this would call a cloud function or API to send email
+            // This is a simulation of that operation
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    console.log(`Email sent to ${userEmail} with status ${newStatus} and message: ${message}`);
+                    resolve();
+                }, 800);
+            });
+        }
+        
+        // Add to access log
+        async function addToAccessLog(deviceId, action) {
+            // In a real application, add a log entry to Firebase
+            // This is a simulation of that operation
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    console.log(`Added to access log: Device ${deviceId} - ${action}`);
+                    resolve();
+                }, 300);
+            });
+        }
+        
+        // Initialize the UI when the page loads
+        document.addEventListener('DOMContentLoaded', initUI);
+    </script>
+</body>
+</html>

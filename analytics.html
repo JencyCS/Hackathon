@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recycling Analytics Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --dark-color: #1e1e2c;
+            --light-color: #f8f9fa;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --eco-green: #2ecc71;
+            --eco-blue: #3498db;
+            --eco-teal: #1abc9c;
+            --eco-purple: #9b59b6;
+            --gray-color: #6c757d;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .sidebar-header h2 i {
+            color: var(--accent-color);
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin: 5px 0;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .menu-item i {
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        .menu-item span {
+            font-size: 16px;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .logout-btn i {
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome-message h1 {
+            font-size: 28px;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .welcome-message p {
+            color: var(--gray-color);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            padding: 8px 15px;
+            font-size: 16px;
+            width: 250px;
+        }
+
+        .search-bar i {
+            color: var(--gray-color);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-info h4 {
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 14px;
+            color: var(--gray-color);
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        /* Page Title */
+        .page-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .page-title i {
+            background: var(--eco-green);
+            color: white;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            margin-right: 15px;
+            font-size: 22px;
+        }
+
+        .page-title h2 {
+            font-size: 24px;
+            color: var(--dark-color);
+        }
+
+        /* Stats Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-right: 20px;
+        }
+
+        .stat-info h3 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+
+        .stat-info p {
+            color: var(--gray-color);
+        }
+
+        /* Charts Section */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .chart-actions select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+        }
+
+        .chart-canvas {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Certificates Section */
+        .certificates-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .view-all {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .certificates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .certificate-card {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .certificate-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .certificate-header {
+            background: linear-gradient(to right, var(--eco-green), var(--eco-teal));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .certificate-body {
+            padding: 20px;
+        }
+
+        .certificate-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        .certificate-desc {
+            color: var(--gray-color);
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .certificate-data {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .data-item {
+            text-align: center;
+        }
+
+        .data-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--eco-green);
+        }
+
+        .data-label {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+
+        /* Comparison Section */
+        .comparison-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .comparison-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .comparison-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .comparison-icon {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: var(--eco-green);
+        }
+
+        .comparison-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+
+        .comparison-label {
+            color: var(--gray-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .sidebar-header h2 span,
+            .menu-item span {
+                display: none;
+            }
+            
+            .menu-item {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .menu-item i {
+                margin-right: 0;
+            }
+            
+            .logout-btn span {
+                display: none;
+            }
+            
+            .logout-btn {
+                justify-content: center;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+            }
+            
+            .search-bar {
+                width: 100%;
+            }
+            
+            .search-bar input {
+                width: 100%;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .certificates-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .stat-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-chart-line"></i> <span>Dashboard</span></h2>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-user-circle"></i>
+                <span>See Profile</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-briefcase"></i>
+                <span>Assets</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-truck-moving"></i>
+                <span>Track Recycling</span>
+            </div>
+            <div class="menu-item active">
+                <i class="fas fa-chart-pie"></i>
+                <span>Analytics</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </div>
+        </div>
+        
+        <div class="sidebar-footer">
+            <div class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <div class="welcome-message">
+                <h1>Environmental Analytics</h1>
+                <p>Track your organization's sustainability impact</p>
+            </div>
+            
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search analytics...">
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-info">
+                    <h4>John Doe</h4>
+                    <p>Sustainability Manager</p>
+                </div>
+                <div class="avatar">JD</div>
+            </div>
+        </div>
+        
+        <div class="page-title">
+            <i class="fas fa-leaf"></i>
+            <h2>Environmental Impact Dashboard</h2>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(46, 204, 113, 0.1); color: var(--eco-green);">
+                    <i class="fas fa-cloud"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>4.8t</h3>
+                    <p>CO₂ Emissions Saved</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(52, 152, 219, 0.1); color: var(--eco-blue);">
+                    <i class="fas fa-weight-hanging"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>2,450kg</h3>
+                    <p>E-Waste Recycled</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(155, 89, 182, 0.1); color: var(--eco-purple);">
+                    <i class="fas fa-tint"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>1.2m L</h3>
+                    <p>Water Saved</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(26, 188, 156, 0.1); color: var(--eco-teal);">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>18.5MWh</h3>
+                    <p>Energy Saved</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Section -->
+        <div class="charts-container">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">CO₂ Savings Over Time</div>
+                    <div class="chart-actions">
+                        <select>
+                            <option>Last 6 Months</option>
+                            <option>Last Year</option>
+                            <option>All Time</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-canvas">
+                    <canvas id="co2Chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Materials Recycled</div>
+                    <div class="chart-actions">
+                        <select>
+                            <option>By Weight</option>
+                            <option>By Units</option>
+                            <option>By Value</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-canvas">
+                    <canvas id="materialsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Certificates Section -->
+        <div class="certificates-section">
+            <div class="section-header">
+                <div class="section-title">Green Certificates</div>
+                <a href="#" class="view-all">View All</a>
+            </div>
+            
+            <div class="certificates-grid">
+                <div class="certificate-card">
+                    <div class="certificate-header">
+                        <i class="fas fa-award fa-3x"></i>
+                        <h3>Carbon Neutral Certificate</h3>
+                    </div>
+                    <div class="certificate-body">
+                        <div class="certificate-title">Q3 2023 Achievement</div>
+                        <div class="certificate-desc">Awarded for offsetting 100% of operational carbon emissions through recycling initiatives.</div>
+                        <div class="certificate-data">
+                            <div class="data-item">
+                                <div class="data-value">4.2t</div>
+                                <div class="data-label">CO₂ Offset</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-value">#CN23876</div>
+                                <div class="data-label">Certificate ID</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="certificate-card">
+                    <div class="certificate-header">
+                        <i class="fas fa-recycle fa-3x"></i>
+                        <h3>E-Waste Recycling</h3>
+                    </div>
+                    <div class="certificate-body">
+                        <div class="certificate-title">Platinum Tier Recycler</div>
+                        <div class="certificate-desc">Recognized for recycling over 95% of collected e-waste through certified channels.</div>
+                        <div class="certificate-data">
+                            <div class="data-item">
+                                <div class="data-value">98%</div>
+                                <div class="data-label">Recycling Rate</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-value">#EW98432</div>
+                                <div class="data-label">Certificate ID</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="certificate-card">
+                    <div class="certificate-header">
+                        <i class="fas fa-seedling fa-3x"></i>
+                        <h3>Sustainability Leader</h3>
+                    </div>
+                    <div class="certificate-body">
+                        <div class="certificate-title">2023 Industry Award</div>
+                        <div class="certificate-desc">Awarded to top 5% of companies demonstrating excellence in sustainable IT practices.</div>
+                        <div class="certificate-data">
+                            <div class="data-item">
+                                <div class="data-value">Top 5%</div>
+                                <div class="data-label">Industry Rank</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-value">#SL20235</div>
+                                <div class="data-label">Certificate ID</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comparison Section -->
+        <div class="comparison-section">
+            <div class="section-header">
+                <div class="section-title">Environmental Impact Comparison</div>
+                <a href="#" class="view-all">Download Report</a>
+            </div>
+            
+            <div class="comparison-cards">
+                <div class="comparison-card">
+                    <div class="comparison-icon">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    <div class="comparison-value">428</div>
+                    <div class="comparison-label">Trees Equivalent Saved</div>
+                </div>
+                
+                <div class="comparison-card">
+                    <div class="comparison-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="comparison-value">32</div>
+                    <div class="comparison-label">Cars Off the Road</div>
+                </div>
+                
+                <div class="comparison-card">
+                    <div class="comparison-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="comparison-value">18</div>
+                    <div class="comparison-label">Homes Powered for Year</div>
+                </div>
+                
+                <div class="comparison-card">
+                    <div class="comparison-icon">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                    <div class="comparison-value">56</div>
+                    <div class="comparison-label">Flights Saved (NY-LON)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // CO2 Savings Chart
+            const co2Ctx = document.getElementById('co2Chart').getContext('2d');
+            const co2Chart = new Chart(co2Ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'CO₂ Saved (kg)',
+                        data: [120, 190, 300, 500, 700, 650, 750, 900, 950, 1100, 1250, 1400],
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                        borderColor: '#2ecc71',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Kilograms of CO₂'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Materials Recycled Chart
+            const materialsCtx = document.getElementById('materialsChart').getContext('2d');
+            const materialsChart = new Chart(materialsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Laptops', 'Monitors', 'Phones', 'Tablets', 'Servers', 'Printers'],
+                    datasets: [{
+                        label: 'Weight (kg)',
+                        data: [650, 820, 120, 85, 510, 265],
+                        backgroundColor: [
+                            'rgba(52, 152, 219, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(155, 89, 182, 0.7)',
+                            'rgba(241, 196, 15, 0.7)',
+                            'rgba(230, 126, 34, 0.7)',
+                            'rgba(26, 188, 156, 0.7)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Kilograms Recycled'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Sidebar menu item functionality
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelector('.menu-item.active').classList.remove('active');
+                this.classList.add('active');
+                
+                // In a real app, this would navigate to different pages
+                if (this.querySelector('span').textContent === 'Dashboard') {
+                    alert('Redirecting to Dashboard...');
+                } else if (this.querySelector('span').textContent === 'See Profile') {
+                    alert('Redirecting to Profile...');
+                } else if (this.querySelector('span').textContent === 'Assets') {
+                    alert('Redirecting to Assets...');
+                } else if (this.querySelector('span').textContent === 'Track Recycling') {
+                    alert('Redirecting to Tracking...');
+                }
+            });
+        });
+        
+        // Logout button functionality
+        document.querySelector('.logout-btn').addEventListener('click', function() {
+            alert('Logout clicked! In a real application, this would log you out and redirect to the login page.');
+        });
+    </script>
+</body>
+</html>

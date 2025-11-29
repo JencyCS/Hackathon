@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Waste Management System</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #2ecc71;
+            --primary-dark: #27ae60;
+            --secondary: #3498db;
+            --secondary-dark: #2980b9;
+            --dark: #2c3e50;
+            --dark-light: #34495e;
+            --light: #ecf0f1;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --gray: #95a5a6;
+            --gray-light: #bdc3c7;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--dark), #1a2530);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 1s ease;
+        }
+        
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+            filter: drop-shadow(0 0 5px rgba(46, 204, 113, 0.5));
+        }
+        
+        .logo h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+        
+        nav a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        nav a:hover:after {
+            width: 100%;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Auth Forms */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            animation: slideUp 0.5s ease;
+        }
+        
+        .auth-form {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-form:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .auth-form h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--dark);
+            border: 1px solid var(--gray-light);
+            box-shadow: none;
+        }
+        
+        .btn-secondary:hover {
+            background: #f9f9f9;
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--dark);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .auth-toggle a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-toggle a:hover {
+            color: var(--secondary-dark);
+            text-decoration: underline;
+        }
+        
+        /* Form progress */
+        .form-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .form-progress:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gray-light);
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        
+        .progress-step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--gray);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .progress-step.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 0 5px rgba(46, 204, 113, 0.2);
+        }
+        
+        .progress-step.completed {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+        
+        .step-label {
+            position: absolute;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 0.8rem;
+            color: var(--dark);
+        }
+        
+        /* Form steps */
+        .form-step {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .form-step.active {
+            display: block;
+        }
+        
+        .form-navigation {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .welcome {
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+        
+        .welcome span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .logout-btn {
+            padding: 0.7rem 1.5rem;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+            background: rgba(52, 152, 219, 0.1);
+            width: 70px;
+            height: 70px;
+            line-height: 70px;
+            border-radius: 50%;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .stat-card p {
+            color: #777;
+        }
+        
+        .actions {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .actions h3 {
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            nav ul {
+                gap: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .auth-form {
+                padding: 1.5rem;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-navigation {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .auth-form {
+                padding: 1.5rem 1rem;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+        
+        /* Form Switch */
+        #loginForm {
+            display: block;
+        }
+        
+        #signupForm {
+            display: none;
+        }
+        
+        /* Error messages */
+        .error-message {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        
+        .form-group.error input {
+            border-color: var(--danger);
+        }
+        
+        .form-group.error .error-message {
+            display: block;
+        }
+        
+        /* Success animation */
+        .success-checkmark {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .success-checkmark i {
+            font-size: 4rem;
+            color: var(--primary);
+            animation: pulse 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        
+        <div class="main-content">
+            <!-- Authentication Forms -->
+            <div class="auth-container" id="authContainer">
+                <!-- Login Form -->
+                <div class="auth-form" id="loginForm">
+                    <h2>Login to Your Account</h2>
+                    <form id="loginFormElement">
+                        <div class="form-group">
+                            <label for="loginEmail">Email</label>
+                            <input type="email" id="loginEmail" required placeholder="Enter your email">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <div class="password-container">
+                                <input type="password" id="loginPassword" required placeholder="Enter your password">
+                                <i class="toggle-password fas fa-eye"></i>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn">Login</button>
+                    </form>
+                    <div class="auth-toggle">
+                        <p>Don't have an account? <a href="#" id="showSignup">Sign Up</a></p>
+                    </div>
+                </div>
+                
+                <!-- Signup Form -->
+                <div class="auth-form" id="signupForm">
+                    <h2>Create New Account</h2>
+                    
+                    <!-- Form Progress -->
+                    <div class="form-progress">
+                        <div class="progress-step active" id="step1Indicator">
+                            1
+                            <span class="step-label">Company</span>
+                        </div>
+                        <div class="progress-step" id="step2Indicator">
+                            2
+                            <span class="step-label">Admin</span>
+                        </div>
+                    </div>
+                    
+                    <form id="signupFormElement">
+                        <!-- Step 1: Company Information -->
+                        <div class="form-step active" id="step1">
+                            <div class="form-group">
+                                <label for="companyName">Company Name *</label>
+                                <input type="text" id="companyName" required placeholder="Enter your company name">
+                                <div class="error-message">Please enter a valid company name</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="companyEmail">Company Email *</label>
+                                <input type="email" id="companyEmail" required placeholder="Enter company email">
+                                <div class="error-message">Please enter a valid email address</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="companyPhone">Phone Number *</label>
+                                <input type="tel" id="companyPhone" required placeholder="Enter company phone number">
+                                <div class="error-message">Please enter a valid phone number</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="companyType">Company Type *</label>
+                                <select id="companyType" required>
+                                    <option value="">Select company type</option>
+                                    <option value="private">Private</option>
+                                    <option value="public">Public</option>
+                                    <option value="nonprofit">Non-Profit</option>
+                                    <option value="government">Government</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <div class="error-message">Please select a company type</div>
+                            </div>
+                            <div class="form-navigation">
+                                <button type="button" class="btn" id="nextToStep2">Next</button>
+                                <button type="button" class="btn btn-secondary" id="showLoginFromSignup">Back to Login</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2: Admin Information -->
+                        <div class="form-step" id="step2">
+                            <div class="success-checkmark" id="companySuccess">
+                                <i class="fas fa-check-circle"></i>
+                                <p>Company details saved successfully!</p>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="adminName">Full Name *</label>
+                                <input type="text" id="adminName" required placeholder="Enter admin full name">
+                                <div class="error-message">Please enter a valid name</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="adminEmail">Email *</label>
+                                <input type="email" id="adminEmail" required placeholder="Enter admin email">
+                                <div class="error-message">Please enter a valid email address</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="adminPhone">Phone Number *</label>
+                                <input type="tel" id="adminPhone" required placeholder="Enter admin phone number">
+                                <div class="error-message">Please enter a valid phone number</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="adminPassword">Password *</label>
+                                <div class="password-container">
+                                    <input type="password" id="adminPassword" required placeholder="Create a password">
+                                    <i class="toggle-password fas fa-eye"></i>
+                                </div>
+                                <div class="error-message">Password must be at least 6 characters</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm Password *</label>
+                                <div class="password-container">
+                                    <input type="password" id="confirmPassword" required placeholder="Confirm your password">
+                                    <i class="toggle-password fas fa-eye"></i>
+                                </div>
+                                <div class="error-message">Passwords do not match</div>
+                            </div>
+                            <div class="form-navigation">
+                                <button type="button" class="btn btn-secondary" id="backToStep1">Back</button>
+                                <button type="submit" class="btn">Sign Up</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Dashboard (shown after login) -->
+            <div class="dashboard" id="dashboard">
+                <div class="dashboard-header">
+                    <h2 class="welcome">Welcome, <span id="userCompany">Company Name</span>!</h2>
+                    <button class="logout-btn" id="logoutBtn">Logout</button>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <i class="fas fa-laptop"></i>
+                        <h3>245</h3>
+                        <p>Devices Collected</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-recycle"></i>
+                        <h3>178</h3>
+                        <p>Devices Recycled</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-tree"></i>
+                        <h3>56</h3>
+                        <p>CO₂ Saved (tons)</p>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <h3>E-Waste Management Actions</h3>
+                    <div class="action-buttons">
+                        <button class="btn">Schedule Pickup</button>
+                        <button class="btn">View Recycling Stats</button>
+                        <button class="btn">Request Certificate</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>&copy; 2023 EcoWaste - E-Waste Management System. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Firebase configuration and app logic -->
+    <script>
+        // Firebase configuration - replace with your own config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqTgVdqJsP4h5Dq-iqex5Eooe3TsRYLPw",
+            authDomain: "e-waste-149d2.firebaseapp.com",
+            projectId: "e-waste-149d2",
+            storageBucket: "e-waste-149d2.firebasestorage.app",
+            messagingSenderId: "673162803344",
+            appId: "1:673162803344:web:31f6190298e301b8ca4015",
+            measurementId: "G-V6VFSC3NJE"
+         };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // DOM Elements
+        const loginFormElement = document.getElementById('loginFormElement');
+        const signupFormElement = document.getElementById('signupFormElement');
+        const showSignupLink = document.getElementById('showSignup');
+        const showLoginLink = document.getElementById('showLoginFromSignup');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const authContainer = document.getElementById('authContainer');
+        const dashboard = document.getElementById('dashboard');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userCompanyElement = document.getElementById('userCompany');
+        
+        // Multi-step form elements
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step1Indicator = document.getElementById('step1Indicator');
+        const step2Indicator = document.getElementById('step2Indicator');
+        const nextToStep2Btn = document.getElementById('nextToStep2');
+        const backToStep1Btn = document.getElementById('backToStep1');
+        const companySuccess = document.getElementById('companySuccess');
+        
+        // Show signup form
+        showSignupLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.style.display = 'none';
+            signupForm.style.display = 'block';
+        });
+        
+        // Show login form from signup
+        showLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            signupForm.style.display = 'none';
+            loginForm.style.display = 'block';
+        });
+        
+        // Next button - step 1 to step 2
+        nextToStep2Btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Validate step 1 fields
+            const companyName = document.getElementById('companyName').value;
+            const companyEmail = document.getElementById('companyEmail').value;
+            const companyPhone = document.getElementById('companyPhone').value;
+            const companyType = document.getElementById('companyType').value;
+            
+            let isValid = true;
+            
+            if (!companyName.trim()) {
+                showError('companyName', 'Please enter a valid company name');
+                isValid = false;
+            } else {
+                clearError('companyName');
+            }
+            
+            if (!isValidEmail(companyEmail)) {
+                showError('companyEmail', 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                clearError('companyEmail');
+            }
+            
+            if (!companyPhone.trim() || companyPhone.length < 10) {
+                showError('companyPhone', 'Please enter a valid phone number');
+                isValid = false;
+            } else {
+                clearError('companyPhone');
+            }
+            
+            if (!companyType) {
+                showError('companyType', 'Please select a company type');
+                isValid = false;
+            } else {
+                clearError('companyType');
+            }
+            
+            if (isValid) {
+                // Hide step 1, show step 2
+                step1.classList.remove('active');
+                step2.classList.add('active');
+                step1Indicator.classList.remove('active');
+                step1Indicator.classList.add('completed');
+                step2Indicator.classList.add('active');
+                companySuccess.style.display = 'block';
+                
+                // Pre-fill admin email with company email
+                document.getElementById('adminEmail').value = companyEmail;
+            }
+        });
+        
+        // Back button - step 2 to step 1
+        backToStep1Btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Hide step 2, show step 1
+            step2.classList.remove('active');
+            step1.classList.add('active');
+            step2Indicator.classList.remove('active');
+            step1Indicator.classList.add('active');
+            step1Indicator.classList.remove('completed');
+            companySuccess.style.display = 'none';
+        });
+        
+        // Signup function
+        signupFormElement.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get company details from step 1
+            const companyName = document.getElementById('companyName').value;
+            const companyEmail = document.getElementById('companyEmail').value;
+            const companyPhone = document.getElementById('companyPhone').value;
+            const companyType = document.getElementById('companyType').value;
+            
+            // Get admin details from step 2
+            const adminName = document.getElementById('adminName').value;
+            const adminEmail = document.getElementById('adminEmail').value;
+            const adminPhone = document.getElementById('adminPhone').value;
+            const adminPassword = document.getElementById('adminPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validate step 2 fields
+            let isValid = true;
+            
+            if (!adminName.trim()) {
+                showError('adminName', 'Please enter a valid name');
+                isValid = false;
+            } else {
+                clearError('adminName');
+            }
+            
+            if (!isValidEmail(adminEmail)) {
+                showError('adminEmail', 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                clearError('adminEmail');
+            }
+            
+            if (!adminPhone.trim() || adminPhone.length < 10) {
+                showError('adminPhone', 'Please enter a valid phone number');
+                isValid = false;
+            } else {
+                clearError('adminPhone');
+            }
+            
+            if (adminPassword.length < 6) {
+                showError('adminPassword', 'Password must be at least 6 characters');
+                isValid = false;
+            } else {
+                clearError('adminPassword');
+            }
+            
+            if (adminPassword !== confirmPassword) {
+                showError('confirmPassword', 'Passwords do not match');
+                isValid = false;
+            } else {
+                clearError('confirmPassword');
+            }
+            
+            if (!isValid) return;
+            
+            // Create user with email and password
+            auth.createUserWithEmailAndPassword(adminEmail, adminPassword)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+                    
+                    // Save company and admin details to Firestore
+                    return db.collection('companies').doc(user.uid).set({
+                        companyName: companyName,
+                        companyEmail: companyEmail,
+                        companyPhone: companyPhone,
+                        companyType: companyType,
+                        adminName: adminName,
+                        adminEmail: adminEmail,
+                        adminPhone: adminPhone,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    alert('Account created successfully!');
+                    userCompanyElement.textContent = companyName;
+                    authContainer.style.display = 'flex';
+                    window.location.replace('dashboard.html');
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    alert(`Error: ${errorMessage}`);
+                });
+        });
+        
+        // Login function
+        loginFormElement.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed in
+                    const user = userCredential.user;
+                    
+                    // Get company details from Firestore
+                    return db.collection('companies').doc(user.uid).get();
+                })
+                .then((doc) => {
+                    if (doc.exists) {
+                        const companyData = doc.data();
+                        userCompanyElement.textContent = companyData.companyName;
+                    } else {
+                        userCompanyElement.textContent = "GreenTech Solutions";
+                    }
+                    
+                    authContainer.style.display = 'flex';
+                    window.location.replace('dashboard.html');
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    alert(`Error: ${errorMessage}`);
+                });
+        });
+        
+        // Logout function
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                dashboard.style.display = 'none';
+                authContainer.style.display = 'flex';
+                loginForm.style.display = 'block';
+                signupForm.style.display = 'none';
+                
+                // Reset multi-step form to step 1
+                step2.classList.remove('active');
+                step1.classList.add('active');
+                step2Indicator.classList.remove('active');
+                step1Indicator.classList.add('active');
+                step1Indicator.classList.remove('completed');
+                companySuccess.style.display = 'none';
+                
+                // Clear form fields
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('companyName').value = '';
+                document.getElementById('companyEmail').value = '';
+                document.getElementById('companyPhone').value = '';
+                document.getElementById('companyType').value = '';
+                document.getElementById('adminName').value = '';
+                document.getElementById('adminEmail').value = '';
+                document.getElementById('adminPhone').value = '';
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+            });
+        });
+        
+        // Check if user is already logged in
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in
+                // Get company details from Firestore
+                db.collection('companies').doc(user.uid).get()
+                    .then((doc) => {
+                        if (doc.exists) {
+                            const companyData = doc.data();
+                            userCompanyElement.textContent = companyData.companyName;
+                        } else {
+                            userCompanyElement.textContent = "GreenTech Solutions";
+                        }
+                        
+                        authContainer.style.display = 'flex';
+                        window.location.replace('dashboard.html');
+                    })
+                    .catch((error) => {
+                        console.error("Error getting company document:", error);
+                        userCompanyElement.textContent = "GreenTech Solutions";
+                        authContainer.style.display = 'none';
+                        dashboard.style.display = 'block';
+                    });
+            } else {
+                // User is signed out
+                dashboard.style.display = 'none';
+                authContainer.style.display = 'flex';
+            }
+        });
+        
+        // Utility functions
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        function showError(fieldId, message) {
+            const formGroup = document.getElementById(fieldId).closest('.form-group');
+            formGroup.classList.add('error');
+            const errorElement = formGroup.querySelector('.error-message');
+            errorElement.textContent = message;
+        }
+        
+        function clearError(fieldId) {
+            const formGroup = document.getElementById(fieldId).closest('.form-group');
+            formGroup.classList.remove('error');
+        }
+        
+        // Toggle password visibility
+        document.querySelectorAll('.toggle-password').forEach(item => {
+            item.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        });
+    </script>
+</body>
+</html>
